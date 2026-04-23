@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <h4 class="card-title mb-4 fw-bold text-center">修改收支紀錄</h4>
+                
+                <!-- 注意 action 的網址要帶入 id -->
+                <form action="{{ url_for('transaction.update_transaction', id=transaction.id) }}" method="POST">
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">收支類型 <span class="text-danger">*</span></label>
+                        <div class="d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="type" id="type_expense" value="expense" {% if transaction.type == 'expense' %}checked{% endif %}>
+                                <label class="form-check-label text-danger fw-bold" for="type_expense">支出</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="type" id="type_income" value="income" {% if transaction.type == 'income' %}checked{% endif %}>
+                                <label class="form-check-label text-success fw-bold" for="type_income">收入</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="amount" class="form-label fw-bold">金額 <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-currency-dollar"></i></span>
+                            <input type="number" class="form-control border-start-0 ps-0" id="amount" name="amount" min="0" step="any" required placeholder="0" value="{{ transaction.amount }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category" class="form-label fw-bold">分類 <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-tag"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0" id="category" name="category" placeholder="例如：飲食、交通、薪水..." required value="{{ transaction.category }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="date" class="form-label fw-bold">日期 <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event"></i></span>
+                            <input type="date" class="form-control border-start-0 ps-0" id="date" name="date" required value="{{ transaction.date }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="note" class="form-label fw-bold">備註 <span class="text-muted fw-normal fs-6">(選填)</span></label>
+                        <textarea class="form-control" id="note" name="note" rows="2" placeholder="紀錄這筆花費的細節...">{{ transaction.note }}</textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold">更新紀錄</button>
+                        <a href="{{ url_for('index.index') }}" class="btn btn-light rounded-pill text-muted fw-bold mt-2">取消返回</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

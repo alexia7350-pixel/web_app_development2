@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mb-4">
+    <div class="col-md-8">
+        
+        <!-- 首頁標題與篩選器 -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0 fw-bold">收支總覽</h4>
+            <form class="d-flex align-items-center" action="{{ url_for('index.index') }}" method="GET">
+                <input type="month" name="month" class="form-control form-control-sm me-2" value="{{ current_month }}">
+                <button type="submit" class="btn btn-outline-primary btn-sm px-3">篩選</button>
+                {% if current_month %}
+                    <a href="{{ url_for('index.index') }}" class="btn btn-outline-secondary btn-sm ms-2">全部</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- 統計卡片 -->
+        <div class="row g-3 mb-4">
+            <div class="col-4">
+                <div class="card summary-card text-center h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">總收入</h6>
+                        <h3 class="card-title mb-0 text-success">${{ "{:,.0f}".format(summary.income) }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card summary-card text-center h-100">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">總支出</h6>
+                        <h3 class="card-title mb-0 text-danger">${{ "{:,.0f}".format(summary.expense) }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="card summary-card text-center h-100 bg-light">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">結餘</h6>
+                        <h3 class="card-title mb-0 {% if summary.balance < 0 %}text-danger{% else %}text-primary{% endif %}">
+                            ${{ "{:,.0f}".format(summary.balance) }}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 歷史明細列表 -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0 fw-bold">歷史紀錄</h5>
+            <a href="{{ url_for('transaction.new_transaction') }}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg"></i> 新增紀錄
+            </a>
+        </div>
+        
+        <div class="card shadow-sm border-0 rounded-3">
+            <ul class="list-group list-group-flush rounded-3">
+                {% for t in transactions %}
+                <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold fs-5">{{ t.category }}</span>
+                        <small class="text-muted">
+                            <i class="bi bi-calendar3 me-1"></i>{{ t.date }}
+                            {% if t.note %} <span class="ms-2"><i class="bi bi-chat-left-text me-1"></i>{{ t.note }}</span>{% endif %}
+                        </small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        {% if t.type == 'income' %}
+                            <span class="text-success fw-bold fs-5 me-3">+${{ "{:,.0f}".format(t.amount) }}</span>
+                        {% else %}
+                            <span class="text-danger fw-bold fs-5 me-3">-${{ "{:,.0f}".format(t.amount) }}</span>
+                        {% endif %}
+                        
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light border-0" type="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('transaction.edit_transaction', id=t.id) }}">
+                                        <i class="bi bi-pencil me-2"></i>修改
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ url_for('transaction.delete_transaction', id=t.id) }}" method="POST" onsubmit="return confirm('確定要刪除這筆紀錄嗎？此動作無法還原。');">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-trash me-2"></i>刪除
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                {% else %}
+                <li class="list-group-item text-center py-5 text-muted border-0">
+                    <i class="bi bi-inbox fs-1 d-block mb-3 text-light"></i>
+                    <p class="mb-0">目前還沒有任何收支紀錄喔！</p>
+                    <a href="{{ url_for('transaction.new_transaction') }}" class="btn btn-sm btn-outline-primary mt-3">立即新增</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
